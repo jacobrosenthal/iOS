@@ -280,6 +280,14 @@ static int rssi = 0;
     NSLog(@"-------------------------------------");
 }
 
+- (BOOL) UUIDSAreEqual:(NSUUID *)UUID1 UUID2:(NSUUID *)UUID2
+{
+    if ([UUID1.UUIDString isEqualToString:UUID2.UUIDString])
+        return TRUE;
+    else
+        return FALSE;
+}
+
 -(void) getAllServicesFromPeripheral:(CBPeripheral *)p
 {
     [p discoverServices:nil]; // Discover all services without filter
@@ -418,11 +426,8 @@ static int rssi = 0;
         for(int i = 0; i < self.peripherals.count; i++)
         {
             CBPeripheral *p = [self.peripherals objectAtIndex:i];
-            
-            if ((p.UUID == NULL) || (peripheral.UUID == NULL))
-                continue;
-            
-            if ([self UUIDSAreEqual:p.UUID UUID2:peripheral.UUID])
+
+            if ([p isEqual:peripheral])
             {
                 [self.peripherals replaceObjectAtIndex:i withObject:peripheral];
                 NSLog(@"Duplicate UUID found updating...");
