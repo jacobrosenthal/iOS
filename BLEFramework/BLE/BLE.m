@@ -66,7 +66,7 @@ static int rssi = 0;
     {
         NSLog(@"Could not find service with UUID %@ on peripheral with UUID %@",
                [self CBUUIDToString:serviceUUID],
-               p.identifier.UUIDString);
+               p.UUID);
         
         return;
     }
@@ -78,7 +78,7 @@ static int rssi = 0;
         NSLog(@"Could not find characteristic with UUID %@ on service with UUID %@ on peripheral with UUID %@",
               [self CBUUIDToString:characteristicUUID],
               [self CBUUIDToString:serviceUUID],
-              p.identifier.UUIDString);
+              p.UUID);
         
         return;
     }
@@ -117,7 +117,7 @@ static int rssi = 0;
     {
         NSLog(@"Could not find service with UUID %@ on peripheral with UUID %@",
               [self CBUUIDToString:serviceUUID],
-              p.identifier.UUIDString);
+              p.UUID);
         
         return;
     }
@@ -129,7 +129,7 @@ static int rssi = 0;
         NSLog(@"Could not find characteristic with UUID %@ on service with UUID %@ on peripheral with UUID %@",
               [self CBUUIDToString:characteristicUUID],
               [self CBUUIDToString:serviceUUID],
-              p.identifier.UUIDString);
+              p.UUID);
         
         return;
     }
@@ -145,7 +145,7 @@ static int rssi = 0;
     {
         NSLog(@"Could not find service with UUID %@ on peripheral with UUID %@",
               [self CBUUIDToString:serviceUUID],
-              p.identifier.UUIDString);
+              p.UUID);
         
         return;
     }
@@ -157,7 +157,7 @@ static int rssi = 0;
         NSLog(@"Could not find characteristic with UUID %@ on service with UUID %@ on peripheral with UUID %@",
               [self CBUUIDToString:characteristicUUID],
               [self CBUUIDToString:serviceUUID],
-              p.identifier.UUIDString);
+              p.UUID);
         
         return;
     }
@@ -210,7 +210,7 @@ static int rssi = 0;
 
 - (void) connectPeripheral:(CBPeripheral *)peripheral
 {
-    NSLog(@"Connecting to peripheral with UUID : %@", peripheral.identifier.UUIDString);
+    NSLog(@"Connecting to peripheral with UUID : %@", peripheral.UUID);
     
     self.activePeripheral = peripheral;
     self.activePeripheral.delegate = self;
@@ -257,8 +257,8 @@ static int rssi = 0;
     {
         CBPeripheral *p = [self.peripherals objectAtIndex:i];
         
-        if (p.identifier != NULL)
-            NSLog(@"%d  |  %@", i, p.identifier.UUIDString);
+        if (p.UUID != NULL)
+            NSLog(@"%d  |  %@", i, p.UUID);
         else
             NSLog(@"%d  |  NULL", i);
         
@@ -271,21 +271,13 @@ static int rssi = 0;
     NSLog(@"------------------------------------");
     NSLog(@"Peripheral Info :");
     
-    if (peripheral.identifier != NULL)
-        NSLog(@"UUID : %@", peripheral.identifier.UUIDString);
+    if (peripheral.UUID != NULL)
+        NSLog(@"UUID : %@", peripheral.UUID);
     else
         NSLog(@"UUID : NULL");
     
     NSLog(@"Name : %@", peripheral.name);
     NSLog(@"-------------------------------------");
-}
-
-- (BOOL) UUIDSAreEqual:(NSUUID *)UUID1 UUID2:(NSUUID *)UUID2
-{
-    if ([UUID1.UUIDString isEqualToString:UUID2.UUIDString])
-        return TRUE;
-    else
-        return FALSE;
 }
 
 -(void) getAllServicesFromPeripheral:(CBPeripheral *)p
@@ -346,12 +338,11 @@ static int rssi = 0;
 
 -(CBService *) findServiceFromUUID:(CBUUID *)UUID p:(CBPeripheral *)p
 {
-    for(int i = 0; i < p.services.count; i++)
-    {
-        CBService *s = [p.services objectAtIndex:i];
-        if ([self compareCBUUID:s.UUID UUID2:UUID])
-            return s;
-    }
+	for (CBService *service in p.services) {
+		if ([[service UUID] isEqual:UUID]) {
+			return service;
+		}
+	}
     
     return nil; //Service not found on this peripheral
 }
@@ -428,10 +419,10 @@ static int rssi = 0;
         {
             CBPeripheral *p = [self.peripherals objectAtIndex:i];
             
-            if ((p.identifier == NULL) || (peripheral.identifier == NULL))
+            if ((p.UUID == NULL) || (peripheral.UUID == NULL))
                 continue;
             
-            if ([self UUIDSAreEqual:p.identifier UUID2:peripheral.identifier])
+            if ([self UUIDSAreEqual:p.UUID UUID2:peripheral.UUID])
             {
                 [self.peripherals replaceObjectAtIndex:i withObject:peripheral];
                 NSLog(@"Duplicate UUID found updating...");
@@ -449,8 +440,8 @@ static int rssi = 0;
 
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral
 {
-    if (peripheral.identifier != NULL)
-        NSLog(@"Connected to %@ successful", peripheral.identifier.UUIDString);
+    if (peripheral.UUID != NULL)
+        NSLog(@"Connected to %@ successful", peripheral.UUID);
     else
         NSLog(@"Connected to NULL successful");
     
@@ -517,7 +508,7 @@ static bool done = false;
         NSLog(@"Error in setting notification state for characteristic with UUID %@ on service with UUID %@ on peripheral with UUID %@",
                [self CBUUIDToString:characteristic.UUID],
                [self CBUUIDToString:characteristic.service.UUID],
-               peripheral.identifier.UUIDString);
+               peripheral.UUID);
         
         NSLog(@"Error code was %s", [[error description] cStringUsingEncoding:NSStringEncodingConversionAllowLossy]);
     }
